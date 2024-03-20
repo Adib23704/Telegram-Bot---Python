@@ -11,6 +11,8 @@ This is a Telegram bot that allows users to get the current temperature for a sp
 5. Rename `.env.example` to `.env` and put the obtained values there.
 6. Run the script using `py app.py` and message `/start` or use the button on your bot.
 
+DEMO: [@AdibPythonTest_bot](https://t.me/AdibPythonTest_bot)
+
 ### Contributing
 
 Feel free to fork the repository and contribute improvements or additional features.
