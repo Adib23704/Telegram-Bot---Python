@@ -1,9 +1,21 @@
 import requests
+import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from dotenv import load_dotenv
+load_dotenv()
 
-TOKEN = 'TOKEN HERE'
+TOKEN = os.environ.get('TOKEN')
+API_KEY = os.environ.get('API_KEY')
+
+def get_temperature(location):
+    url = f'https://api.weatherapi.com/v1/current.json?key={API_KEY}&q={location}&aqi=no'
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
