@@ -26,10 +26,10 @@ async def location(update, context):
         data = response.json()
         temperature_f = data['currentConditions']['temp']
 
-        keyboard = [[InlineKeyboardButton("Show in Celsius", callback_data=f"celsius {temperature_f:.1f} {update.message.text}")]]
+        keyboard = [[InlineKeyboardButton("Show in Celsius", callback_data=f"celsius {temperature_f:.1f} {data['resolvedAddress']}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The current temperature of {update.message.text} is {temperature_f}°F", reply_markup=reply_markup)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The current temperature of {data['resolvedAddress']} is {temperature_f}°F", reply_markup=reply_markup)
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Error! Please enter a valid location name:")
 
