@@ -12,10 +12,7 @@ API_KEY = os.environ.get('API_KEY')
 def get_temperature(location):
     url = f'https://api.weatherapi.com/v1/current.json?key={API_KEY}&q={location}&aqi=no'
     response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response
 
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
@@ -27,13 +24,17 @@ async def start(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome! Please enter a location name:")
 
 async def location(update, context):
-    temp = get_temperature(update.message.text)
-    temperature_f = temp['current']['temp_f']
+    response = get_temperature(update.message.text)
+    if response.status_code == 200:
+        data = response.json()
+        temperature_f = data['current']['temp_f']
 
-    keyboard = [[InlineKeyboardButton("Show in Celsius", callback_data=f"celsius {temperature_f:.1f} {update.message.text}")]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+        keyboard = [[InlineKeyboardButton("Show in Celsius", callback_data=f"celsius {temperature_f:.1f} {update.message.text}")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The current temperature of {update.message.text} is {temperature_f}°F", reply_markup=reply_markup)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The current temperature of {update.message.text} is {temperature_f}°F", reply_markup=reply_markup)
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Error! Please enter a valid location name:")
 
 async def button(update, context):
     query = update.callback_query
@@ -58,6 +59,12 @@ async def start_with_keyboard(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome! Please enter a location name:", reply_markup=reply_markup)
 
 updater = Application.builder().token(TOKEN).build()
+
+if updater.bot.get_me is None:
+    print("Bot initialization failed")
+    exit(1)
+else:
+    print("Bot initialized successfully")
 
 start_handler = CommandHandler('start', start_with_keyboard)
 location_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, location)
