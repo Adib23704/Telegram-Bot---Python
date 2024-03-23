@@ -10,7 +10,7 @@ TOKEN = os.environ.get('TOKEN')
 API_KEY = os.environ.get('API_KEY')
 
 def get_temperature(location):
-    url = f'https://api.weatherapi.com/v1/current.json?key={API_KEY}&q={location}&aqi=no'
+    url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}?key={API_KEY}&contentType=json&include=current&unitGroup=us'
     response = requests.get(url)
     return response
 
@@ -20,14 +20,11 @@ def celsius_to_fahrenheit(celsius):
 def fahrenheit_to_celsius(fahrenheit):
     return (fahrenheit - 32) * 5/9
 
-async def start(update, context):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome! Please enter a location name:")
-
 async def location(update, context):
     response = get_temperature(update.message.text)
     if response.status_code == 200:
         data = response.json()
-        temperature_f = data['current']['temp_f']
+        temperature_f = data['currentConditions']['temp']
 
         keyboard = [[InlineKeyboardButton("Show in Celsius", callback_data=f"celsius {temperature_f:.1f} {update.message.text}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
